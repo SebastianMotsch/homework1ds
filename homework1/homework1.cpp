@@ -1,59 +1,88 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <sstream>
 
-using namespace std;
+const std::string PATH = "C:\\Users\\natet\\source\\repos\\homework1\\homework1\\"; //Change "natet" to the name of your laptop, if it doesn't work lmk
+const int ARRAY_SIZE = 26;
 
 struct book {
-    string title;
-    string author;
+    std::string title;
+    std::string author;
     int wordCount;
-    int letterFrequency;
+    double letterFrequency[ARRAY_SIZE] = { 0 };
     int lineCount;
 };
 
 int main()
 {
     // Input file name to be read
-    string fileName;
-    cout << "Enter name of file to be processed: ";
-    cin >> fileName;
+    std::string fileName;
+    std::cout << "Enter name of file to be processed: ";
+    std::cin >> fileName;
 
     // Attempt to open file, if fail then retry
-    fstream bookData;
-    bookData.open("C:\\Users\\natet\\source\\repos\\homework1\\homework1\\" + fileName + ".txt", ios::in); //change natet to whatever your username is on your laptop
-    while (bookData.fail()) {                                                                              //unless you changed your directory, if so good luck
-        cout << "Invalid file name, input another file name." << endl;
-        cin >> fileName;
-        bookData.open(fileName + ".txt", ios::in);
+    std::fstream bookData;
+    bookData.open(PATH + fileName + ".txt", std::ios::in); 
+    while (bookData.fail()) {                                                                              
+        std::cout << "Invalid file name, input another file name." << std::endl;
+        std::cin >> fileName;
+        bookData.open(PATH + fileName + ".txt", std::ios::in);
     }
     
     book newBook;
     
     if (bookData.is_open()) {
-        string text;
-   
+        std::string line;
+        char ch;
+        int numberCharacters = 0;
         int numberWords = 0;
         int numberLines = 0;
 
-        getline(bookData, text); //Grabs first line, sets title
-        newBook.title = text;
-        getline(bookData, text); //Grabs second line, sets author
-        newBook.author = text;
+        getline(bookData, line); //Grabs first line, sets title
+        newBook.title = line;
+        getline(bookData, line); //Grabs second line, sets author
+        newBook.author = line;
 
-        while (getline(bookData, text)) {                //Runs through each line, then runs through each word in that line with space delimiter
-            while (getline(bookData, text, ' ')) {
-                numberWords++;
+        while (getline(bookData, line)) {  //Runs through each line, incrementing numberLines by one
+            numberLines++;
+            std::stringstream ss(line);        //Stringstream object allows us to extract the line that was just read, then find how many words were in that line using space delimiter
+            while (getline(ss, line, ' ')) {
+                numberWords++;                           
+                for (int i = 0; i < line.length(); i++) {   //Runs through the word and increments the letter frequency by one in letterFrequency.
+                    char chUpper = toupper(line[i]);
+                    if (chUpper >= 'A' && chUpper <= 'Z') {
+                        newBook.letterFrequency[chUpper - 'A']++;
+                        numberCharacters++;
+                    }
+                }
             }
-            numberLines++; //this is fucked up
         }
 
-
+        //Loop through letterFrequency and divide each entry by totalCharacters to provide percentage.
+        for (int i = 0; i < ARRAY_SIZE; i++) {
+           newBook.letterFrequency[i] /= numberCharacters;
+        }
+       
         newBook.wordCount = numberWords;
         newBook.lineCount = numberLines;
+
     }
 
-    cout << newBook.title << endl << newBook.author << endl << newBook.wordCount << endl << newBook.lineCount; //removing this later
+    std::cout << newBook.title << std::endl << newBook.author << std::endl << newBook.wordCount << std::endl << newBook.lineCount << std::endl; //remove if u want
+
+    
+    /*
+    
+    Example of how to loop through letterFrequency with ASCII elements, i.e. "A: 0.06654%"
+
+    for (int i = 0; i < ARRAY_SIZE; i++) {
+        std::cout << char(i + 65) << ": " << newBook.letterFrequency[i] << std::endl;
+    }
+    
+    */
+    
+    
 
 
 }

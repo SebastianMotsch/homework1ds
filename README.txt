@@ -1,3 +1,3 @@
-download as ZIP, extract, then place main folder into your visual studio directory
+download as ZIP, extract, then place homework1ds-master folder into your visual studio directory
 
-C:\Users\natet\source\repos\homework1\homework1\
+C:\Users\[USERNAME]\source\repos\homework1\homework1\

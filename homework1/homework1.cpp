@@ -3,7 +3,7 @@
 #include <fstream>
 #include <sstream>
 
-const std::string PATH = "C:\\Users\\natet\\source\\repos\\homework1\\homework1\\"; //Change "natet" to the name of your laptop, if it doesn't work lmk
+//const std::string PATH = "C:\\Users\\natet\\source\\repos\\homework1\\homework1\\"; // not needed
 const int ARRAY_SIZE = 26;
 
 struct book {
@@ -23,11 +23,11 @@ int main()
 
     // Attempt to open file, if fail then retry
     std::fstream bookData;
-    bookData.open(PATH + fileName + ".txt", std::ios::in); 
+    bookData.open(fileName + ".txt", std::ios::in); 
     while (bookData.fail()) {                                                                              
         std::cout << "Invalid file name, input another file name." << std::endl;
         std::cin >> fileName;
-        bookData.open(PATH + fileName + ".txt", std::ios::in);
+        bookData.open(fileName + ".txt", std::ios::in);
     }
     
     book newBook;

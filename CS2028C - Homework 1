@@ -1,0 +1,100 @@
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <iomanip>
+
+const int ARRAY_SIZE = 26;
+
+struct book {
+    std::string title;
+    std::string author;
+    int wordCount;
+    double letterFrequency[ARRAY_SIZE] = { 0 };
+    int lineCount;
+};
+
+// Function to display the letter frequency
+void letterFrequency(const book& newBook) {
+    std::cout << newBook.title << " letter frequency:" << std::endl;
+    for (int i = 0; i < ARRAY_SIZE; i++) {
+        char letter = static_cast<char>('a' + i);
+        std::cout << letter << ": " << std::fixed << std::setprecision(4) << (newBook.letterFrequency[i] * 100) << "%" << std::endl;
+    }
+}
+
+int main() {
+    while (true) {
+        // Input file name to be read
+        std::string fileName;
+        std::cout << "Enter name of the file to be processed: ";
+        std::cin >> fileName;
+
+        // Attempt to open the file, if fail then retry
+        std::ifstream bookData(fileName + ".txt");
+        while (!bookData.is_open()) {
+            std::cout << "Invalid file name, input another file name." << std::endl;
+            std::cin >> fileName;
+            bookData.open(fileName + ".txt");
+        }
+
+        book newBook;
+
+        if (bookData.is_open()) {
+            std::string line;
+            int numberCharacters = 0;
+            int numberWords = 0;
+            int numberLines = 0;
+
+            getline(bookData, line); // Grabs the first line, sets title
+            newBook.title = line;
+            std::cout << "Title: " << newBook.title << std::endl;
+
+            getline(bookData, line); // Grabs the second line, sets author
+            newBook.author = line;
+            std::cout << "Author: " << newBook.author << std::endl;
+
+            while (getline(bookData, line)) { // Runs through each line, incrementing numberLines by one
+                numberLines++;
+                std::stringstream ss(line); // Stringstream object allows us to extract the line that was just read, then find how many words were in that line using space delimiter
+                while (ss >> line) { // Simplified word counting
+                    numberWords++;
+                    for (int i = 0; i < line.length(); i++) { // Runs through the word and increments the letter frequency by one in letterFrequency.
+                        char chLower = tolower(line[i]);
+                        if (chLower >= 'a' && chLower <= 'z') {
+                            newBook.letterFrequency[chLower - 'a']++;
+                            numberCharacters++;
+                        }
+                    }
+                }
+            }
+
+            // Loop through letterFrequency and divide each entry by totalCharacters to provide a percentage.
+            for (int i = 0; i < ARRAY_SIZE; i++) {
+                newBook.letterFrequency[i] /= numberCharacters;
+            }
+
+            newBook.wordCount = numberWords;
+            newBook.lineCount = numberLines;
+
+            std::cout << "Word Count: " << newBook.wordCount << std::endl;
+            std::cout << "Line Count: " << newBook.lineCount << std::endl;
+
+            bookData.close();
+
+            char viewFrequency;
+            std::cout << "Would you like to view the letter frequency (Y/N)? ";
+            std::cin >> viewFrequency;
+            if (viewFrequency == 'Y' || viewFrequency == 'y') {
+                letterFrequency(newBook);
+            }
+        }
+
+        char processAnotherBook;
+        std::cout << "Do you wish to process another book (Y/N)? ";
+        std::cin >> processAnotherBook;
+        if (processAnotherBook != 'Y' && processAnotherBook != 'y') {
+            break;
+        }
+    }
+}
